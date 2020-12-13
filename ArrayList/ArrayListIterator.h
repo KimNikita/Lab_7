@@ -49,8 +49,10 @@ inline TArrayListIterator<T>::~TArrayListIterator()
 }
 
 template<class T>
-inline TArrayListIterator<T>& TArrayListIterator<T>::operator=(TArrayListIterator<T>& _v) : list(_v.list), index(_v.index)
+inline TArrayListIterator<T>& TArrayListIterator<T>::operator=(TArrayListIterator<T>& _v)
 {
+  this->list = _v.list;
+  this->index = _v.index;
 }
 
 template<class T>
