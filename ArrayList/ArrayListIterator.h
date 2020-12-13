@@ -15,7 +15,7 @@ protected:
   int index;
 public:
   TArrayListIterator(TArrayList<T>& _list, int _index = -2);
-  TArrayListIterator(TArrayListIterator<T>& _v);
+  TArrayListIterator(const TArrayListIterator<T>& _v);
   ~TArrayListIterator();
 
   TArrayListIterator<T>& operator =(TArrayListIterator<T>& _v);
@@ -38,7 +38,7 @@ inline TArrayListIterator<T>::TArrayListIterator(TArrayList<T>& _list, int _inde
 }
 
 template<class T>
-inline TArrayListIterator<T>::TArrayListIterator(TArrayListIterator<T>& _v) : list(_v.list), index(_v.index)
+inline TArrayListIterator<T>::TArrayListIterator(const TArrayListIterator<T>& _v) : list(_v.list), index(_v.index)
 {
 }
 
