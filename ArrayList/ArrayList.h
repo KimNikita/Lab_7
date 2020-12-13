@@ -7,7 +7,7 @@
 
 using namespace std;
 
-template <class T>
+template <class T1>
 class TArrayListIterator;
 
 template <class T>
@@ -21,10 +21,10 @@ protected:
   int root;
 public:
   TArrayList(int _size = 1);
-  TArrayList(TArrayList<T>& _v);
+  TArrayList(const TArrayList<T>& _v);
   ~TArrayList();
 
-  TArrayList<T>& operator =(TArrayList<T>& _v);
+  TArrayList<T>& operator =(const TArrayList<T>& _v);
 
   void InsFirst(T d);
   void InsLast(T d);
@@ -57,9 +57,9 @@ public:
   void WriteToFile(string name);
 
   template <class T1>
-  friend ofstream& operator<<(ofstream& ofstr, const TArrayList<T1>& A);
+  friend ofstream& operator<<(ofstream& ofstr, TArrayList<T1>& A);
 
-  template <class T>
+  template <class T1>
   friend class TArrayListIterator;
 };
 
@@ -81,7 +81,7 @@ inline TArrayList<T>::TArrayList(int _size)
 }
 
 template <class T>
-TArrayList<T>::TArrayList(TArrayList<T>& _v)
+TArrayList<T>::TArrayList(const TArrayList<T>& _v)
 {
   this->count = _v.count;
   this->size = _v.size;
@@ -114,7 +114,7 @@ TArrayList<T>::~TArrayList()
 }
 
 template <class T>
-TArrayList<T>& TArrayList<T>::operator=(TArrayList<T>& _v)
+TArrayList<T>& TArrayList<T>::operator=(const TArrayList<T>& _v)
 {
   if (this == &_v)
     return *this;
@@ -192,6 +192,27 @@ inline void TArrayList<T>::InsLast(T d)
 template<class T>
 inline void TArrayList<T>::Ins(TArrayListIterator<T>& e, T d)
 {
+  if (this->IsFull())
+    throw - 1;
+
+  if (links[e.index] == -1)
+  {
+    this->InsLast(d);
+  }
+  else
+  {
+    int i;
+    for (i = 0; i < size; i++)
+    {
+      if (links[i] == -2)
+        break;
+    }
+
+    links[i] = links[e.index];
+    links[e.index] = i;
+    data[i] = d;
+    count++;
+  }
 
 }
 
@@ -216,11 +237,7 @@ inline TArrayListIterator<T> TArrayList<T>::begin()
 template<class T>
 inline TArrayListIterator<T> TArrayList<T>::end()
 {
-  int end = root;
-  while (links[end] != -1)
-    end = links[end];
-
-  return TArrayListIterator<T>(*this, end);
+  return TArrayListIterator<T>(*this, -1);
 }
 
 template<class T>
@@ -287,7 +304,30 @@ inline void TArrayList<T>::DelLast()
 template<class T>
 inline void TArrayList<T>::Del(TArrayListIterator<T>& e)
 {
+  if (this->IsEmpty())
+    throw - 1;
 
+  if (links[e.index] == -1)
+  {
+    this->DelLast();
+  }
+  else if (e.index == root)
+  {
+    this->DelFirst();
+  }
+  else
+  {
+    int i;
+    for (i = 0; i < size; i++)
+    {
+      if (links[i] == e.index)
+        break;
+    }
+
+    links[i] = links[e.index];
+    links[e.index] = -2;
+    count--;
+  }
 }
 
 template<class T>
@@ -298,6 +338,9 @@ inline int TArrayList<T>::GetCount()
 
 template <class T1>
 ostream& operator<<(ostream& ostr, const TArrayList<T1>& A) {
+  if (A.IsEmpty())
+    return ostr;
+
   int i = A.root;
 
   while (A.links[i] != -1)
@@ -311,6 +354,9 @@ ostream& operator<<(ostream& ostr, const TArrayList<T1>& A) {
 
 template <class T1>
 istream& operator>>(istream& istr, TArrayList<T1>& A) {
+  if (A.IsFull())
+    throw - 1;
+
   int count;
   istr >> count;
 
@@ -329,16 +375,15 @@ istream& operator>>(istream& istr, TArrayList<T1>& A) {
 template<class T>
 vector<int> TArrayList<T>::ElemsModKEqualsZero(int k)
 {
-  if (this->root == 0)
-    throw new std::exception();
-  TListElem<T>* elem = this->root;
   vector<int> res;
-  while (elem != 0)
-  {
-    if (elem->GetData() % k == 0)
-      res.push_back(elem->GetData());
-    elem = elem->GetNext();
-  }
+
+  if (this->IsEmpty())
+    return res;
+
+  for (TArrayListIterator<int> itr = this->begin(); itr != this->end(); ++itr)
+    if (*itr % k == 0)
+      res.push_back(*itr);
+
   return res;
 }
 
@@ -351,13 +396,13 @@ inline void TArrayList<T>::WriteToFile(string name)
 }
 
 template<class T1>
-inline ofstream& operator<<(ofstream& ofstr, const TArrayList<T1>& L)
+inline ofstream& operator<<(ofstream& ofstr, TArrayList<T1>& A)
 {
-  TListElem<T1>* i = L.root;
-  while (i != 0)
-  {
-    ofstr << *i;
-    i = i->GetNext();
-  }
+  if (A.IsEmpty())
+    return ofstr;
+
+  for (TArrayListIterator<int> itr = A.begin(); itr != A.end(); ++itr)
+    ofstr << *itr;
+
   return ofstr;
 }

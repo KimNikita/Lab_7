@@ -4,13 +4,13 @@
 
 using namespace std;
 
-template <class T>
+template <class T1>
 class TArrayList;
 
 template <class T>
 class TArrayListIterator
 {
-private:
+protected:
   TArrayList<T>& list;
   int index;
 public:
@@ -18,7 +18,7 @@ public:
   TArrayListIterator(TArrayListIterator<T>& _v);
   ~TArrayListIterator();
 
-  TArrayListIterator<T>& operator =(const TArrayListIterator<T>& _v);
+  TArrayListIterator<T>& operator =(TArrayListIterator<T>& _v);
 
   bool HasNext();
   bool operator ==(const TArrayListIterator<T>& _v);
@@ -27,20 +27,19 @@ public:
   TArrayListIterator<T>& operator++();
   T& operator*(int);
   T& operator*();
+
+  template <class T1>
+  friend class TArrayList;
 };
 
 template<class T>
-inline TArrayListIterator<T>::TArrayListIterator(TArrayList<T>& _list, int _index)
+inline TArrayListIterator<T>::TArrayListIterator(TArrayList<T>& _list, int _index) :list(_list), index(_index)
 {
-  this->list = _list;
-  this->index = _index;
 }
 
 template<class T>
-inline TArrayListIterator<T>::TArrayListIterator(TArrayListIterator<T>& _v)
+inline TArrayListIterator<T>::TArrayListIterator(TArrayListIterator<T>& _v) : list(_v.list), index(_v.index)
 {
-  this->list = _v.list;
-  this->index = _v.index;
 }
 
 template<class T>
@@ -50,10 +49,8 @@ inline TArrayListIterator<T>::~TArrayListIterator()
 }
 
 template<class T>
-inline TArrayListIterator<T>& TArrayListIterator<T>::operator=(const TArrayListIterator<T>& _v)
+inline TArrayListIterator<T>& TArrayListIterator<T>::operator=(TArrayListIterator<T>& _v) : list(_v.list), index(_v.index)
 {
-  this->list = _v.list;
-  this->index = _v.index;
 }
 
 template<class T>
@@ -65,7 +62,7 @@ inline bool TArrayListIterator<T>::HasNext()
 template<class T>
 inline bool TArrayListIterator<T>::operator==(const TArrayListIterator<T>& _v)
 {
-  return this->index == _v.index && *(this->list) == *(_v.list);
+  return this->index == _v.index;
 }
 
 template<class T>
